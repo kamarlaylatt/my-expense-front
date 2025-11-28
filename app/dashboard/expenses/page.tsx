@@ -63,18 +63,14 @@ export default function ExpensesPage() {
         page: currentPage,
         limit: 10,
       });
-
-      if (response.success && response.data) {
-        const expensesData = response.data.expenses || [];
-        const normalizedExpenses = Array.isArray(expensesData)
-          ? expensesData.map((e) => ({
-              ...e,
-              amount:
-                typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
-            }))
-          : [];
+      if (response.success) {
+        const expensesData = Array.isArray(response.data) ? response.data : [];
+        const normalizedExpenses = expensesData.map((e) => ({
+          ...e,
+          amount: typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
+        }));
         setExpenses(normalizedExpenses);
-        setPagination(response.data.pagination || null);
+        setPagination(response.pagination || null);
       }
     } catch (error) {
       toast({
@@ -92,9 +88,7 @@ export default function ExpensesPage() {
     try {
       const response = await categoriesApi.getAll();
       if (response.success && response.data) {
-        // Handle nested categories array
-        const categoriesData = response.data.categories || response.data;
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        setCategories(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
