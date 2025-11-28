@@ -33,7 +33,7 @@ export default function CategoriesPage() {
     try {
       const response = await categoriesApi.getAll();
       if (response.success && response.data) {
-        setCategories(response.data);
+        setCategories(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
       toast({
@@ -154,7 +154,7 @@ export default function CategoriesPage() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((category) => (
+            {Array.isArray(categories) && categories.map((category) => (
               <CategoryCard
                 key={category.id}
                 category={category}

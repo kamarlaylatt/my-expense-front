@@ -57,7 +57,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
-                      {user ? getInitials(user.name) : "U"}
+                      {user?.name ? getInitials(user.name) : "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>

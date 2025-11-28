@@ -34,6 +34,9 @@ export function ExpenseTable({
   onEdit,
   onDelete,
 }: ExpenseTableProps) {
+  // Ensure expenses is always an array
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+
   if (loading) {
     return (
       <div className="rounded-md border">
@@ -73,7 +76,7 @@ export function ExpenseTable({
     );
   }
 
-  if (expenses.length === 0) {
+  if (safeExpenses.length === 0) {
     return (
       <div className="rounded-md border p-8 text-center">
         <p className="text-muted-foreground">No expenses found</p>
@@ -94,7 +97,7 @@ export function ExpenseTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {expenses.map((expense) => (
+          {safeExpenses.map((expense) => (
             <TableRow key={expense.id}>
               <TableCell className="font-medium">
                 {formatDate(expense.date)}

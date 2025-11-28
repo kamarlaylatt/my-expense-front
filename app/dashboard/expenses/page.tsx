@@ -206,8 +206,8 @@ export default function ExpensesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
+                {Array.isArray(categories) && categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id?.toString() || ""}>
                     <div className="flex items-center gap-2">
                       <div
                         className="h-2 w-2 rounded-full"

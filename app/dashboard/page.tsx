@@ -115,21 +115,21 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <SummaryCard
             title="Total Expenses"
-            value={summary ? formatCurrency(summary.totalAmount) : "$0.00"}
+            value={summary?.totalAmount ? formatCurrency(summary.totalAmount) : "$0.00"}
             description="All time total"
             icon={DollarSign}
             loading={isLoading}
           />
           <SummaryCard
             title="Total Transactions"
-            value={summary ? summary.totalCount.toString() : "0"}
+            value={summary?.totalCount?.toString() || "0"}
             description="Number of expenses"
             icon={Receipt}
             loading={isLoading}
           />
           <SummaryCard
             title="Categories"
-            value={categories.length.toString()}
+            value={(categories?.length || 0).toString()}
             description="Active categories"
             icon={Receipt}
             loading={isLoading}

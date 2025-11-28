@@ -109,15 +109,15 @@ export function ExpenseForm({
       <div className="space-y-2">
         <Label htmlFor="categoryId">Category</Label>
         <Select
-          defaultValue={expense?.categoryId?.toString()}
+          defaultValue={expense?.categoryId ? expense.categoryId.toString() : undefined}
           onValueChange={(value) => setValue("categoryId", parseInt(value))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id.toString()}>
+            {Array.isArray(categories) && categories.map((category) => (
+              <SelectItem key={category.id} value={category.id?.toString() || ""}>
                 <div className="flex items-center gap-2">
                   <div
                     className="h-3 w-3 rounded-full"
