@@ -74,8 +74,8 @@ export const authApi = {
 
 // Categories API
 export const categoriesApi = {
-  getAll: async (): Promise<ApiResponse<Category[]>> => {
-    const response = await api.get<ApiResponse<Category[]>>("/api/categories");
+  getAll: async (): Promise<ApiResponse<{ categories: Category[] }>> => {
+    const response = await api.get<ApiResponse<{ categories: Category[] }>>("/api/categories");
     return response.data;
   },
 
@@ -102,7 +102,7 @@ export const categoriesApi = {
 
 // Expenses API
 export const expensesApi = {
-  getAll: async (filters?: ExpenseFilters): Promise<PaginatedResponse<Expense>> => {
+  getAll: async (filters?: ExpenseFilters): Promise<ApiResponse<{ expenses: Expense[] }>> => {
     const params = new URLSearchParams();
     if (filters?.categoryId) params.append("categoryId", String(filters.categoryId));
     if (filters?.startDate) params.append("startDate", filters.startDate);
@@ -110,7 +110,7 @@ export const expensesApi = {
     if (filters?.page) params.append("page", String(filters.page));
     if (filters?.limit) params.append("limit", String(filters.limit));
     
-    const response = await api.get<PaginatedResponse<Expense>>(`/api/expenses?${params.toString()}`);
+    const response = await api.get<ApiResponse<{ expenses: Expense[] }>>(`/api/expenses?${params.toString()}`);
     return response.data;
   },
 

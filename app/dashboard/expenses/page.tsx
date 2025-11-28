@@ -63,8 +63,8 @@ export default function ExpensesPage() {
         page: currentPage,
         limit: 10,
       });
-      if (response.success) {
-        const expensesData = Array.isArray(response.data) ? response.data : [];
+      if (response.success && response.data) {
+        const expensesData = response.data.expenses || [];
         const normalizedExpenses = expensesData.map((e) => ({
           ...e,
           amount: typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
@@ -88,7 +88,8 @@ export default function ExpensesPage() {
     try {
       const response = await categoriesApi.getAll();
       if (response.success && response.data) {
-        setCategories(Array.isArray(response.data) ? response.data : []);
+        const categoriesData = response.data.categories || [];
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
