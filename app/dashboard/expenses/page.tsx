@@ -54,7 +54,10 @@ export default function ExpensesPage() {
     setIsLoading(true);
     try {
       const response = await expensesApi.getAll({
-        categoryId: categoryFilter ? parseInt(categoryFilter) : undefined,
+        categoryId:
+          categoryFilter && categoryFilter !== "all"
+            ? parseInt(categoryFilter)
+            : undefined,
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         page: currentPage,
@@ -62,8 +65,16 @@ export default function ExpensesPage() {
       });
 
       if (response.success && response.data) {
-        setExpenses(response.data);
-        setPagination(response.pagination || null);
+        const expensesData = response.data.expenses || [];
+        const normalizedExpenses = Array.isArray(expensesData)
+          ? expensesData.map((e) => ({
+              ...e,
+              amount:
+                typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
+            }))
+          : [];
+        setExpenses(normalizedExpenses);
+        setPagination(response.data.pagination || null);
       }
     } catch (error) {
       toast({
@@ -81,10 +92,13 @@ export default function ExpensesPage() {
     try {
       const response = await categoriesApi.getAll();
       if (response.success && response.data) {
-        setCategories(response.data);
+        // Handle nested categories array
+        const categoriesData = response.data.categories || response.data;
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
+      setCategories([]);
     }
   }, []);
 

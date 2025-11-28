@@ -43,10 +43,20 @@ export default function DashboardPage() {
         setSummary(summaryRes.data);
       }
       if (expensesRes.success && expensesRes.data) {
-        setRecentExpenses(expensesRes.data);
+        const recent = expensesRes.data.expenses || [];
+        const normalized = Array.isArray(recent)
+          ? recent.map((e) => ({
+              ...e,
+              amount:
+                typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
+            }))
+          : [];
+        setRecentExpenses(normalized);
       }
       if (categoriesRes.success && categoriesRes.data) {
-        setCategories(categoriesRes.data);
+        // Handle nested categories array
+        const categoriesData = categoriesRes.data.categories || categoriesRes.data;
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       }
     } catch (error) {
       toast({

@@ -33,7 +33,9 @@ export default function CategoriesPage() {
     try {
       const response = await categoriesApi.getAll();
       if (response.success && response.data) {
-        setCategories(Array.isArray(response.data) ? response.data : []);
+        // Handle nested categories array
+        const categoriesData = response.data.categories || response.data;
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       }
     } catch (error) {
       toast({
