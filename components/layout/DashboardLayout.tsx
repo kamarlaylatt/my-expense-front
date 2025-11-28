@@ -24,25 +24,25 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen">
-        <div className="h-14 border-b">
-          <div className="container flex h-14 items-center">
+      <div className="min-h-screen" suppressHydrationWarning>
+        <div className="h-14 border-b" suppressHydrationWarning>
+          <div className="container flex h-14 items-center" suppressHydrationWarning>
             <Skeleton className="h-6 w-32" />
-            <div className="flex-1" />
+            <div className="flex-1" suppressHydrationWarning />
             <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         </div>
-        <div className="flex h-[calc(100vh-3.5rem)]">
-          <div className="hidden md:block w-64 border-r p-4">
-            <div className="space-y-2">
+        <div className="flex h-[calc(100vh-3.5rem)]" suppressHydrationWarning>
+          <div className="hidden md:block w-64 border-r p-4" suppressHydrationWarning>
+            <div className="space-y-2" suppressHydrationWarning>
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
           </div>
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6" suppressHydrationWarning>
             <Skeleton className="h-8 w-48 mb-6" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" suppressHydrationWarning>
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
@@ -58,11 +58,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" suppressHydrationWarning>
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
-      <div className="flex h-[calc(100vh-3.5rem)]">
+      <div className="flex h-[calc(100vh-3.5rem)]" suppressHydrationWarning>
         <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6" suppressHydrationWarning>{children}</main>
       </div>
     </div>
   );
