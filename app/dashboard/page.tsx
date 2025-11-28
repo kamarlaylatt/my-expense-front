@@ -43,7 +43,7 @@ export default function DashboardPage() {
         setSummary(summaryRes.data);
       }
       if (expensesRes.success && expensesRes.data) {
-        const recent = expensesRes.data.expenses || [];
+        const recent = expensesRes.data;
         const normalized = Array.isArray(recent)
           ? recent.map((e) => ({
               ...e,
@@ -54,9 +54,7 @@ export default function DashboardPage() {
         setRecentExpenses(normalized);
       }
       if (categoriesRes.success && categoriesRes.data) {
-        // Handle nested categories array
-        const categoriesData = categoriesRes.data.categories || categoriesRes.data;
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
       }
     } catch (error) {
       toast({
