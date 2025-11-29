@@ -245,7 +245,7 @@ export default function ExpensesPage() {
                   {startDate ? format(startDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="min-w-[280px] p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -271,7 +271,7 @@ export default function ExpensesPage() {
                   {endDate ? format(endDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="min-w-[280px] p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={endDate}
