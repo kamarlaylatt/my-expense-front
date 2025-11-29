@@ -46,8 +46,8 @@ export default function ExpensesPage() {
 
   // Filters
   const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [currentPage, setCurrentPage] = useState(1);
 
   const { toast } = useToast();
@@ -198,6 +198,24 @@ export default function ExpensesPage() {
     setCurrentPage(1);
   };
 
+  const setQuickRange = (range: "today" | "oneweek" | "onemonth" | "oneyear") => {
+    const now = new Date();
+    const end = new Date(now);
+    let start = new Date(now);
+    if (range === "today") {
+      // start remains today
+    } else if (range === "oneweek") {
+      start.setDate(start.getDate() - 7);
+    } else if (range === "onemonth") {
+      start.setMonth(start.getMonth() - 1);
+    } else if (range === "oneyear") {
+      start.setFullYear(start.getFullYear() - 1);
+    }
+    setStartDate(start);
+    setEndDate(end);
+    setCurrentPage(1);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -230,92 +248,131 @@ export default function ExpensesPage() {
                 </Badge>
               )}
             </div>
-            <div className="flex flex-wrap gap-4 items-end">
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[180px] h-10 rounded-lg">
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All categories</SelectItem>
-                    {Array.isArray(categories) && categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id?.toString() || ""}>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 rounded-full"
-                            style={{ backgroundColor: category.color || "#888888" }}
-                          />
-                          {category.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Start Date</label>
-                <Popover>
-                  <PopoverTrigger asChild>
+            <div className="space-y-4">
+              {/* Row 1: Quick Range Buttons + Category */}
+              <div className="flex flex-wrap gap-4 items-end">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Date Range</label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={(startDate && endDate && format(startDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && format(endDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")) ? "default" : "outline"}
+                      className="h-10 rounded-lg"
+                      onClick={() => setQuickRange("today")}
+                    >
+                      Today
+                    </Button>
                     <Button
                       variant="outline"
-                      className={cn(
-                        "w-[180px] justify-start text-left font-normal h-10 rounded-lg",
-                        !startDate && "text-muted-foreground"
-                      )}
+                      className="h-10 rounded-lg"
+                      onClick={() => setQuickRange("oneweek")}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : "Pick a date"}
+                      One Week
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="min-w-[280px] p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">End Date</label>
-                <Popover>
-                  <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={cn(
-                        "w-[180px] justify-start text-left font-normal h-10 rounded-lg",
-                        !endDate && "text-muted-foreground"
-                      )}
+                      className="h-10 rounded-lg"
+                      onClick={() => setQuickRange("onemonth")}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : "Pick a date"}
+                      One Month
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="min-w-[280px] p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                    <Button
+                      variant="outline"
+                      className="h-10 rounded-lg"
+                      onClick={() => setQuickRange("oneyear")}
+                    >
+                      One Year
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-[180px] h-10 rounded-lg">
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All categories</SelectItem>
+                      {Array.isArray(categories) && categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id?.toString() || ""}>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-2.5 w-2.5 rounded-full"
+                              style={{ backgroundColor: category.color || "#888888" }}
+                            />
+                            {category.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {hasActiveFilters && (
-                <Button 
-                  variant="ghost" 
-                  onClick={clearFilters}
-                  className="h-10 rounded-lg text-muted-foreground hover:text-foreground"
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Clear filters
-                </Button>
-              )}
+              {/* Row 2: Start Date + End Date + Clear filters */}
+              <div className="flex flex-wrap gap-4 items-end">
+                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider sm:whitespace-nowrap sm:mr-2">Start Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-[200px] justify-start text-left font-normal h-10 rounded-lg",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? format(startDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="min-w-[280px] p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider sm:whitespace-nowrap sm:mr-2">End Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-[200px] justify-start text-left font-normal h-10 rounded-lg",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="min-w-[280px] p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {hasActiveFilters && (
+                  <Button 
+                    variant="ghost" 
+                    onClick={clearFilters}
+                    className="h-10 rounded-lg text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Clear filters
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
