@@ -133,7 +133,7 @@ export function ExpenseTable({
               </TableCell>
               <TableCell className="text-right">
                 <span className="font-semibold text-foreground">
-                  {formatCurrency(expense.amount)}
+                  {formatCurrency(expense.amount, expense.currency?.name)}
                 </span>
               </TableCell>
               <TableCell>

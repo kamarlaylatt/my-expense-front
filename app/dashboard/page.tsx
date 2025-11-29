@@ -17,15 +17,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { expensesApi, categoriesApi } from "@/lib/api";
+import { expensesApi, categoriesApi, currenciesApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
-import type { ExpenseSummary, Expense, Category } from "@/types";
-import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock } from "lucide-react";
+import type { ExpenseSummary, Expense, Category, Currency } from "@/types";
+import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock, Coins } from "lucide-react";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
   const [recentExpenses, setRecentExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,14 +34,15 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [summaryRes, expensesRes, categoriesRes] = await Promise.all([
+      const [summaryRes, expensesRes, categoriesRes, currenciesRes] = await Promise.all([
         expensesApi.getSummary(),
         expensesApi.getAll({ limit: 5 }),
         categoriesApi.getAll(),
+        currenciesApi.getAll(),
       ]);
 
       if (summaryRes.success && summaryRes.data) {
-        setSummary(summaryRes.data);
+        setSummary(summaryRes.data.summary);
       }
       if (expensesRes.success && expensesRes.data) {
         const recent = expensesRes.data.expenses || [];
@@ -56,6 +58,10 @@ export default function DashboardPage() {
       if (categoriesRes.success && categoriesRes.data) {
         const categoriesData = categoriesRes.data.categories || [];
         setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+      }
+      if (currenciesRes.success && currenciesRes.data) {
+        const currenciesData = currenciesRes.data.currencies || [];
+        setCurrencies(Array.isArray(currenciesData) ? currenciesData : []);
       }
     } catch (error) {
       toast({
@@ -78,6 +84,7 @@ export default function DashboardPage() {
     description?: string;
     date?: Date;
     categoryId: number;
+    currencyId: number;
   }) => {
     setIsSubmitting(true);
     try {
@@ -86,6 +93,7 @@ export default function DashboardPage() {
         description: data.description,
         date: data.date?.toISOString(),
         categoryId: data.categoryId,
+        currencyId: data.currencyId,
       });
 
       if (response.success) {
@@ -109,6 +117,16 @@ export default function DashboardPage() {
     }
   };
 
+  // Format totals by currency for display
+  const formatTotalsByCurrency = () => {
+    if (!summary?.totalsByCurrency || summary.totalsByCurrency.length === 0) {
+      return "$0.00";
+    }
+    return summary.totalsByCurrency
+      .map((t) => formatCurrency(t.totalAmount, t.currency.name))
+      .join(" • ");
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -130,10 +148,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 stagger-fade-in">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 stagger-fade-in">
           <SummaryCard
             title="Total Expenses"
-            value={summary?.totalAmount ? formatCurrency(summary.totalAmount) : "$0.00"}
+            value={formatTotalsByCurrency()}
             description="All time total"
             icon={Wallet}
             loading={isLoading}
@@ -155,12 +173,46 @@ export default function DashboardPage() {
             loading={isLoading}
             variant="warning"
           />
+          <SummaryCard
+            title="Currencies"
+            value={(currencies?.length || 0).toString()}
+            description="Active currencies"
+            icon={Coins}
+            loading={isLoading}
+            variant="default"
+          />
         </div>
+
+        {/* Currency Breakdown Cards */}
+        {summary?.totalsByCurrency && summary.totalsByCurrency.length > 1 && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {summary.totalsByCurrency.map((currencyTotal) => (
+              <Card key={currencyTotal.currency.id} className="border-0 shadow-md">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Coins className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">{currencyTotal.currency.name}</span>
+                    </div>
+                    <span className="text-lg font-bold">
+                      {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
+                    </span>
+                  </div>
+                  {currencyTotal.count !== undefined && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {currencyTotal.count} transaction{currencyTotal.count !== 1 ? "s" : ""}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Category Breakdown */}
           <CategoryBreakdown
-            data={summary?.byCategory || []}
+            data={summary?.totalByCategory || []}
             loading={isLoading}
           />
 
@@ -203,6 +255,7 @@ export default function DashboardPage() {
           </DialogHeader>
           <ExpenseForm
             categories={categories}
+            currencies={currencies}
             onSubmit={handleCreateExpense}
             onCancel={() => setIsDialogOpen(false)}
             isLoading={isSubmitting}

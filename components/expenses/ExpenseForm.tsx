@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, DollarSign, FileText, Tag } from "lucide-react";
+import { CalendarIcon, DollarSign, FileText, Tag, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,13 +23,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import type { Category, Expense } from "@/types";
+import type { Category, Currency, Expense } from "@/types";
 
 const expenseSchema = z.object({
   amount: z.number().positive("Amount must be positive"),
   description: z.string().optional(),
   date: z.date().optional(),
   categoryId: z.number().positive("Please select a category"),
+  currencyId: z.number().positive("Please select a currency"),
 });
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
@@ -37,6 +38,7 @@ type ExpenseFormData = z.infer<typeof expenseSchema>;
 interface ExpenseFormProps {
   expense?: Expense;
   categories: Category[];
+  currencies: Currency[];
   onSubmit: (data: ExpenseFormData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
@@ -45,6 +47,7 @@ interface ExpenseFormProps {
 export function ExpenseForm({
   expense,
   categories,
+  currencies,
   onSubmit,
   onCancel,
   isLoading,
@@ -61,9 +64,10 @@ export function ExpenseForm({
   } = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
-      amount: expense?.amount || 0,
+      amount: expense?.amount ? (typeof expense.amount === 'string' ? parseFloat(expense.amount) : expense.amount) : 0,
       description: expense?.description || "",
       categoryId: expense?.categoryId || 0,
+      currencyId: expense?.currencyId || 0,
       date: expense?.date ? new Date(expense.date) : new Date(),
     },
   });
@@ -74,28 +78,62 @@ export function ExpenseForm({
     }
   }, [date, setValue]);
 
+  // Set default currency if available and not editing
+  useEffect(() => {
+    if (!expense && currencies.length > 0) {
+      setValue("currencyId", currencies[0].id);
+    }
+  }, [currencies, expense, setValue]);
+
   const handleFormSubmit = async (data: ExpenseFormData) => {
     await onSubmit(data);
   };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
-        <div className="relative">
-          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="amount"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            className="pl-10 h-11 bg-muted/50"
-            {...register("amount", { valueAsNumber: true })}
-          />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="amount"
+              type="number"
+              step="0.01"
+              placeholder="0.00"
+              className="pl-10 h-11 bg-muted/50"
+              {...register("amount", { valueAsNumber: true })}
+            />
+          </div>
+          {errors.amount && (
+            <p className="text-sm text-destructive">{errors.amount.message}</p>
+          )}
         </div>
-        {errors.amount && (
-          <p className="text-sm text-destructive">{errors.amount.message}</p>
-        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="currencyId" className="text-sm font-medium">Currency</Label>
+          <div className="relative">
+            <Coins className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+            <Select
+              defaultValue={expense?.currencyId ? expense.currencyId.toString() : currencies[0]?.id?.toString()}
+              onValueChange={(value) => setValue("currencyId", parseInt(value))}
+            >
+              <SelectTrigger className="pl-10 h-11 bg-muted/50">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.isArray(currencies) && currencies.map((currency) => (
+                  <SelectItem key={currency.id} value={currency.id?.toString() || ""}>
+                    {currency.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {errors.currencyId && (
+            <p className="text-sm text-destructive">{errors.currencyId.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">

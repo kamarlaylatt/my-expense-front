@@ -10,7 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { LayoutDashboard, Receipt, FolderOpen, Sparkles, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Receipt, FolderOpen, Coins, Sparkles, type LucideIcon } from "lucide-react";
 
 interface SidebarItem {
   title: string;
@@ -37,6 +37,12 @@ const sidebarItems: SidebarItem[] = [
     href: "/dashboard/categories",
     icon: FolderOpen,
     description: "Organize spending",
+  },
+  {
+    title: "Currencies",
+    href: "/dashboard/currencies",
+    icon: Coins,
+    description: "Manage currencies",
   },
 ];
 

@@ -27,17 +27,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
-import { expensesApi, categoriesApi } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import type { Expense, Category, Pagination } from "@/types";
-import { Plus, CalendarIcon, ChevronLeft, ChevronRight, X, Filter, Receipt } from "lucide-react";
+import { expensesApi, categoriesApi, currenciesApi } from "@/lib/api";
+import { cn, formatCurrency } from "@/lib/utils";
+import type { Expense, Category, Currency, Pagination, CurrencyTotal } from "@/types";
+import { Plus, CalendarIcon, ChevronLeft, ChevronRight, X, Filter, Receipt, Coins } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [totalsByCurrency, setTotalsByCurrency] = useState<CurrencyTotal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +77,7 @@ export default function ExpensesPage() {
         }));
         setExpenses(normalizedExpenses);
         setPagination(response.pagination || null);
+        setTotalsByCurrency(response.data.totalsByCurrency || []);
       }
     } catch (error) {
       toast({
@@ -101,9 +104,23 @@ export default function ExpensesPage() {
     }
   }, []);
 
+  const fetchCurrencies = useCallback(async () => {
+    try {
+      const response = await currenciesApi.getAll();
+      if (response.success && response.data) {
+        const currenciesData = response.data.currencies || [];
+        setCurrencies(Array.isArray(currenciesData) ? currenciesData : []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch currencies:", error);
+      setCurrencies([]);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+    fetchCurrencies();
+  }, [fetchCategories, fetchCurrencies]);
 
   useEffect(() => {
     fetchExpenses();
@@ -114,6 +131,7 @@ export default function ExpensesPage() {
     description?: string;
     date?: Date;
     categoryId: number;
+    currencyId: number;
   }) => {
     setIsSubmitting(true);
     try {
@@ -124,6 +142,7 @@ export default function ExpensesPage() {
           description: data.description,
           date: data.date?.toISOString(),
           categoryId: data.categoryId,
+          currencyId: data.currencyId,
         });
       } else {
         response = await expensesApi.create({
@@ -131,6 +150,7 @@ export default function ExpensesPage() {
           description: data.description,
           date: data.date?.toISOString(),
           categoryId: data.categoryId,
+          currencyId: data.currencyId,
         });
       }
 
@@ -235,6 +255,27 @@ export default function ExpensesPage() {
             Add Expense
           </Button>
         </div>
+
+        {/* Totals by Currency */}
+        {totalsByCurrency.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {totalsByCurrency.map((currencyTotal) => (
+              <Card key={currencyTotal.currency.id} className="border-0 shadow-md">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Coins className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">{currencyTotal.currency.name}</span>
+                    </div>
+                    <span className="text-lg font-bold">
+                      {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Filters */}
         <Card className="border-0 shadow-lg">
@@ -441,6 +482,7 @@ export default function ExpensesPage() {
           <ExpenseForm
             expense={editingExpense || undefined}
             categories={categories}
+            currencies={currencies}
             onSubmit={handleCreateOrUpdateExpense}
             onCancel={() => {
               setIsDialogOpen(false);

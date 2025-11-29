@@ -17,12 +17,22 @@ export interface Category {
   _count?: { expenses: number };
 }
 
+export interface Currency {
+  id: number;
+  name: string;
+  usdExchangeRate: string;
+  userId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Expense {
   id: number;
-  amount: number;
+  amount: number | string;
   description?: string;
   date: string;
   categoryId: number;
+  currencyId: number;
   userId: number;
   createdAt: string;
   updatedAt: string;
@@ -31,16 +41,37 @@ export interface Expense {
     name: string;
     color?: string;
   };
+  currency?: {
+    id: number;
+    name: string;
+    usdExchangeRate: string;
+  };
+}
+
+export interface CurrencyTotal {
+  currency: {
+    id: number;
+    name: string;
+    usdExchangeRate: string;
+  };
+  totalAmount: string;
+  count?: number;
+}
+
+export interface CategoryTotal {
+  category: {
+    id: number;
+    name: string;
+    color?: string;
+  };
+  totalCount: number;
+  byCurrency: CurrencyTotal[];
 }
 
 export interface ExpenseSummary {
-  totalAmount: number;
   totalCount: number;
-  byCategory: Array<{
-    category: { id: number; name: string; color?: string };
-    totalAmount: number;
-    count: number;
-  }>;
+  totalsByCurrency: CurrencyTotal[];
+  totalByCategory: CategoryTotal[];
 }
 
 export interface Pagination {
@@ -80,6 +111,7 @@ export interface CreateExpense {
   description?: string;
   date?: string;
   categoryId: number;
+  currencyId: number;
 }
 
 export interface UpdateExpense {
@@ -87,6 +119,7 @@ export interface UpdateExpense {
   description?: string;
   date?: string;
   categoryId?: number;
+  currencyId?: number;
 }
 
 export interface CreateCategory {
@@ -99,6 +132,16 @@ export interface UpdateCategory {
   name?: string;
   description?: string;
   color?: string;
+}
+
+export interface CreateCurrency {
+  name: string;
+  usdExchangeRate: number;
+}
+
+export interface UpdateCurrency {
+  name?: string;
+  usdExchangeRate?: number;
 }
 
 export interface ExpenseFilters {
