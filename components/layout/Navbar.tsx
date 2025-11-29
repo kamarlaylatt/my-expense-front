@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Menu, LogOut, User, LayoutDashboard } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavbarProps {
   onMenuClick?: () => void;
@@ -51,6 +52,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggle />
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

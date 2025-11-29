@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeScript } from "@/components/theme-script";
 
 export const metadata: Metadata = {
   title: "My Expense",
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
+        <ThemeScript />
         <AuthProvider>
           {children}
           <Toaster />
