@@ -24,28 +24,30 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen" suppressHydrationWarning>
-        <div className="h-14 border-b" suppressHydrationWarning>
-          <div className="container flex h-14 items-center" suppressHydrationWarning>
-            <Skeleton className="h-6 w-32" />
+      <div className="min-h-screen bg-muted/20" suppressHydrationWarning>
+        <div className="h-16 border-b bg-background" suppressHydrationWarning>
+          <div className="container flex h-16 items-center" suppressHydrationWarning>
+            <Skeleton className="h-9 w-9 rounded-xl" />
+            <Skeleton className="h-5 w-28 ml-3" />
             <div className="flex-1" suppressHydrationWarning />
-            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-xl" />
           </div>
         </div>
-        <div className="flex h-[calc(100vh-3.5rem)]" suppressHydrationWarning>
-          <div className="hidden md:block w-64 border-r p-4" suppressHydrationWarning>
-            <div className="space-y-2" suppressHydrationWarning>
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+        <div className="flex h-[calc(100vh-4rem)]" suppressHydrationWarning>
+          <div className="hidden md:block w-72 border-r p-4 bg-muted/20" suppressHydrationWarning>
+            <div className="space-y-3 pt-6" suppressHydrationWarning>
+              <Skeleton className="h-4 w-16 mb-4" />
+              <Skeleton className="h-14 w-full rounded-xl" />
+              <Skeleton className="h-14 w-full rounded-xl" />
+              <Skeleton className="h-14 w-full rounded-xl" />
             </div>
           </div>
-          <main className="flex-1 p-6" suppressHydrationWarning>
-            <Skeleton className="h-8 w-48 mb-6" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" suppressHydrationWarning>
-              <Skeleton className="h-32 w-full" />
-              <Skeleton className="h-32 w-full" />
-              <Skeleton className="h-32 w-full" />
+          <main className="flex-1 p-8 bg-background" suppressHydrationWarning>
+            <Skeleton className="h-10 w-48 mb-8" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" suppressHydrationWarning>
+              <Skeleton className="h-36 w-full rounded-2xl" />
+              <Skeleton className="h-36 w-full rounded-2xl" />
+              <Skeleton className="h-36 w-full rounded-2xl" />
             </div>
           </main>
         </div>
@@ -58,11 +60,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen" suppressHydrationWarning>
+    <div className="min-h-screen bg-muted/20" suppressHydrationWarning>
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
-      <div className="flex h-[calc(100vh-3.5rem)]" suppressHydrationWarning>
+      <div className="flex h-[calc(100vh-4rem)]" suppressHydrationWarning>
         <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-        <main className="flex-1 overflow-y-auto p-6" suppressHydrationWarning>{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-background/50" suppressHydrationWarning>
+          <div className="max-w-7xl mx-auto animate-fade-in">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

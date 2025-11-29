@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, DollarSign, FileText, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,69 +79,80 @@ export function ExpenseForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="amount">Amount</Label>
-        <Input
-          id="amount"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          {...register("amount", { valueAsNumber: true })}
-        />
+        <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
+        <div className="relative">
+          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="amount"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            className="pl-10 h-11 bg-muted/50"
+            {...register("amount", { valueAsNumber: true })}
+          />
+        </div>
         {errors.amount && (
           <p className="text-sm text-destructive">{errors.amount.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Input
-          id="description"
-          placeholder="What was this expense for?"
-          {...register("description")}
-        />
+        <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+        <div className="relative">
+          <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="description"
+            placeholder="What was this expense for?"
+            className="pl-10 h-11 bg-muted/50"
+            {...register("description")}
+          />
+        </div>
         {errors.description && (
           <p className="text-sm text-destructive">{errors.description.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="categoryId">Category</Label>
-        <Select
-          defaultValue={expense?.categoryId ? expense.categoryId.toString() : undefined}
-          onValueChange={(value) => setValue("categoryId", parseInt(value))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.isArray(categories) && categories.map((category) => (
-              <SelectItem key={category.id} value={category.id?.toString() || ""}>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: category.color || "#888888" }}
-                  />
-                  {category.name}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Label htmlFor="categoryId" className="text-sm font-medium">Category</Label>
+        <div className="relative">
+          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+          <Select
+            defaultValue={expense?.categoryId ? expense.categoryId.toString() : undefined}
+            onValueChange={(value) => setValue("categoryId", parseInt(value))}
+          >
+            <SelectTrigger className="pl-10 h-11 bg-muted/50">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.isArray(categories) && categories.map((category) => (
+                <SelectItem key={category.id} value={category.id?.toString() || ""}>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: category.color || "#888888" }}
+                    />
+                    {category.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {errors.categoryId && (
           <p className="text-sm text-destructive">{errors.categoryId.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label>Date</Label>
+        <Label className="text-sm font-medium">Date</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               className={cn(
-                "w-full justify-start text-left font-normal",
+                "w-full justify-start text-left font-normal h-11 bg-muted/50",
                 !date && "text-muted-foreground"
               )}
             >
@@ -160,12 +171,26 @@ export function ExpenseForm({
         </Popover>
       </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end gap-3 pt-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          className="rounded-xl"
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : expense ? "Update" : "Create"}
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="rounded-xl min-w-[100px]"
+        >
+          {isLoading ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-current border-r-transparent rounded-full animate-spin" />
+              Saving...
+            </span>
+          ) : expense ? "Update" : "Create"}
         </Button>
       </div>
     </form>

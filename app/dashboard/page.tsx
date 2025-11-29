@@ -20,7 +20,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { expensesApi, categoriesApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import type { ExpenseSummary, Expense, Category } from "@/types";
-import { DollarSign, Receipt, Plus, ArrowRight } from "lucide-react";
+import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock } from "lucide-react";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
@@ -111,23 +111,33 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Button onClick={() => setIsDialogOpen(true)}>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-1">
+              Welcome back! Here&apos;s your expense overview.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setIsDialogOpen(true)} 
+            className="rounded-xl h-11 px-5 shadow-lg shadow-primary/25"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Expense
           </Button>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 stagger-fade-in">
           <SummaryCard
             title="Total Expenses"
             value={summary?.totalAmount ? formatCurrency(summary.totalAmount) : "$0.00"}
             description="All time total"
-            icon={DollarSign}
+            icon={Wallet}
             loading={isLoading}
+            variant="primary"
           />
           <SummaryCard
             title="Total Transactions"
@@ -135,13 +145,15 @@ export default function DashboardPage() {
             description="Number of expenses"
             icon={Receipt}
             loading={isLoading}
+            variant="success"
           />
           <SummaryCard
             title="Categories"
             value={(categories?.length || 0).toString()}
             description="Active categories"
-            icon={Receipt}
+            icon={FolderOpen}
             loading={isLoading}
+            variant="warning"
           />
         </div>
 
@@ -153,10 +165,15 @@ export default function DashboardPage() {
           />
 
           {/* Recent Expenses */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Recent Expenses</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
+          <Card className="border-0 shadow-lg hover-lift overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10">
+                  <Clock className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Recent Expenses</CardTitle>
+              </div>
+              <Button variant="ghost" size="sm" asChild className="rounded-lg">
                 <Link href="/dashboard/expenses">
                   View All
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -177,11 +194,11 @@ export default function DashboardPage() {
 
       {/* Add Expense Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Expense</DialogTitle>
+            <DialogTitle className="text-xl">Add Expense</DialogTitle>
             <DialogDescription>
-              Create a new expense record.
+              Create a new expense record. Fill in the details below.
             </DialogDescription>
           </DialogHeader>
           <ExpenseForm

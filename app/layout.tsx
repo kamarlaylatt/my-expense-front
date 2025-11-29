@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeScript } from "@/components/theme-script";
 
 export const metadata: Metadata = {
-  title: "My Expense",
-  description: "Track your expenses with ease",
+  title: "ExpenseFlow - Smart Expense Tracking",
+  description: "Track, manage, and optimize your expenses with our beautiful and intuitive expense tracking application",
 };
 
 export default function RootLayout({
@@ -16,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      </head>
+      <body className="antialiased min-h-screen bg-background" suppressHydrationWarning>
         <ThemeScript />
         <AuthProvider>
           {children}

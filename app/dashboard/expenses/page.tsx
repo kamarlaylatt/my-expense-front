@@ -30,7 +30,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { expensesApi, categoriesApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { Expense, Category, Pagination } from "@/types";
-import { Plus, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, CalendarIcon, ChevronLeft, ChevronRight, X, Filter, Receipt } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -49,6 +51,8 @@ export default function ExpensesPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { toast } = useToast();
+
+  const hasActiveFilters = categoryFilter || startDate || endDate;
 
   const fetchExpenses = useCallback(async () => {
     setIsLoading(true);
@@ -196,98 +200,125 @@ export default function ExpensesPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Expenses</h1>
-          <Button onClick={() => setIsDialogOpen(true)}>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Expenses</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage and track all your expenses
+            </p>
+          </div>
+          <Button 
+            onClick={() => setIsDialogOpen(true)}
+            className="rounded-xl h-11 px-5 shadow-lg shadow-primary/25"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Expense
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Category</label>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="All categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All categories</SelectItem>
-                {Array.isArray(categories) && categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id?.toString() || ""}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: category.color || "#888888" }}
-                      />
-                      {category.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Filters</span>
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="rounded-full ml-2">
+                  Active
+                </Badge>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-[180px] h-10 rounded-lg">
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    {Array.isArray(categories) && categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id?.toString() || ""}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: category.color || "#888888" }}
+                          />
+                          {category.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Start Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-[180px] justify-start text-left font-normal",
-                    !startDate && "text-muted-foreground"
-                  )}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Start Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[180px] justify-start text-left font-normal h-10 rounded-lg",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="min-w-[280px] p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">End Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[180px] justify-start text-left font-normal h-10 rounded-lg",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="min-w-[280px] p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {hasActiveFilters && (
+                <Button 
+                  variant="ghost" 
+                  onClick={clearFilters}
+                  className="h-10 rounded-lg text-muted-foreground hover:text-foreground"
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP") : "Pick a date"}
+                  <X className="mr-2 h-4 w-4" />
+                  Clear filters
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="min-w-[280px] p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={setStartDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">End Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-[180px] justify-start text-left font-normal",
-                    !endDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="min-w-[280px] p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={setEndDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {(categoryFilter || startDate || endDate) && (
-            <Button variant="ghost" onClick={clearFilters}>
-              Clear filters
-            </Button>
-          )}
-        </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Expenses Table */}
         <ExpenseTable
@@ -299,9 +330,11 @@ export default function ExpensesPage() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
             <p className="text-sm text-muted-foreground">
-              Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
+              Showing page <span className="font-medium text-foreground">{pagination.page}</span> of{" "}
+              <span className="font-medium text-foreground">{pagination.totalPages}</span>
+              {" "}• {pagination.total} total expenses
             </p>
             <div className="flex gap-2">
               <Button
@@ -309,8 +342,9 @@ export default function ExpensesPage() {
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
+                className="rounded-lg"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 mr-1" />
                 Previous
               </Button>
               <Button
@@ -318,9 +352,10 @@ export default function ExpensesPage() {
                 size="sm"
                 onClick={() => setCurrentPage((p) => p + 1)}
                 disabled={currentPage >= pagination.totalPages}
+                className="rounded-lg"
               >
                 Next
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           </div>
@@ -335,15 +370,15 @@ export default function ExpensesPage() {
           if (!open) setEditingExpense(null);
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl">
               {editingExpense ? "Edit Expense" : "Add Expense"}
             </DialogTitle>
             <DialogDescription>
               {editingExpense
-                ? "Update the expense details."
-                : "Create a new expense record."}
+                ? "Update the expense details below."
+                : "Create a new expense record. Fill in the details below."}
             </DialogDescription>
           </DialogHeader>
           <ExpenseForm
@@ -361,19 +396,30 @@ export default function ExpensesPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteExpense} onOpenChange={() => setDeleteExpense(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Expense</DialogTitle>
-            <DialogDescription>
+            <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <Receipt className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogTitle className="text-center">Delete Expense</DialogTitle>
+            <DialogDescription className="text-center">
               Are you sure you want to delete this expense? This action cannot be
               undone.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeleteExpense(null)}>
+          <div className="flex justify-center gap-3 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteExpense(null)}
+              className="rounded-xl min-w-[100px]"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteExpense}>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteExpense}
+              className="rounded-xl min-w-[100px]"
+            >
               Delete
             </Button>
           </div>

@@ -16,7 +16,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { categoriesApi } from "@/lib/api";
 import type { Category } from "@/types";
-import { Plus } from "lucide-react";
+import { Plus, FolderOpen, Tag, Trash2 } from "lucide-react";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -125,10 +125,19 @@ export default function CategoriesPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <Button onClick={() => setIsDialogOpen(true)}>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
+            <p className="text-muted-foreground mt-1">
+              Organize your expenses with custom categories
+            </p>
+          </div>
+          <Button 
+            onClick={() => setIsDialogOpen(true)}
+            className="rounded-xl h-11 px-5 shadow-lg shadow-primary/25"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Category
           </Button>
@@ -136,25 +145,37 @@ export default function CategoriesPage() {
 
         {/* Categories Grid */}
         {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="rounded-xl border p-6">
-                <Skeleton className="h-6 w-32 mb-4" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-5 w-20" />
+              <div key={i} className="rounded-2xl border-0 bg-card shadow-lg p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-24" />
               </div>
             ))}
           </div>
         ) : categories.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No categories yet</p>
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
+          <div className="text-center py-16">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+              <FolderOpen className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No categories yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+              Create your first category to start organizing your expenses
+            </p>
+            <Button 
+              onClick={() => setIsDialogOpen(true)}
+              className="rounded-xl h-11 px-6"
+            >
+              <Tag className="mr-2 h-4 w-4" />
               Create your first category
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.isArray(categories) && categories.map((category) => (
               <CategoryCard
                 key={category.id}
@@ -175,15 +196,15 @@ export default function CategoriesPage() {
           if (!open) setEditingCategory(null);
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl">
               {editingCategory ? "Edit Category" : "Add Category"}
             </DialogTitle>
             <DialogDescription>
               {editingCategory
-                ? "Update the category details."
-                : "Create a new category for organizing expenses."}
+                ? "Update the category details below."
+                : "Create a new category for organizing your expenses."}
             </DialogDescription>
           </DialogHeader>
           <CategoryForm
@@ -200,20 +221,30 @@ export default function CategoriesPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteCategory} onOpenChange={() => setDeleteCategory(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Category</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete &quot;{deleteCategory?.name}&quot;? This
-              action cannot be undone. Expenses in this category will not be
-              deleted.
+            <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogTitle className="text-center">Delete Category</DialogTitle>
+            <DialogDescription className="text-center">
+              Are you sure you want to delete <span className="font-medium text-foreground">&quot;{deleteCategory?.name}&quot;</span>? 
+              This action cannot be undone. Expenses in this category will not be deleted.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeleteCategory(null)}>
+          <div className="flex justify-center gap-3 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteCategory(null)}
+              className="rounded-xl min-w-[100px]"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteCategory}>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteCategory}
+              className="rounded-xl min-w-[100px]"
+            >
               Delete
             </Button>
           </div>
