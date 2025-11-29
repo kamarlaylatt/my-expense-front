@@ -51,6 +51,7 @@ export default function ExpensesPage() {
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRange, setSelectedRange] = useState<"today" | "oneweek" | "onemonth" | "oneyear" | null>(null);
 
   const { toast } = useToast();
 
@@ -212,14 +213,21 @@ export default function ExpensesPage() {
     setStartDate(undefined);
     setEndDate(undefined);
     setCurrentPage(1);
+    setSelectedRange(null);
   };
 
   const setQuickRange = (range: "today" | "oneweek" | "onemonth" | "oneyear") => {
     const now = new Date();
-    const end = new Date(now);
     let start = new Date(now);
+    let end: Date | undefined = new Date(now);
+    
+    // Reset time to start of day for consistent filtering
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
     if (range === "today") {
-      // start remains today
+      // start is today, clear end date
+      end = undefined;
     } else if (range === "oneweek") {
       start.setDate(start.getDate() - 7);
     } else if (range === "onemonth") {
@@ -230,6 +238,7 @@ export default function ExpensesPage() {
     setStartDate(start);
     setEndDate(end);
     setCurrentPage(1);
+    setSelectedRange(range);
   };
 
   return (
@@ -292,28 +301,28 @@ export default function ExpensesPage() {
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Date Range</label>
                   <div className="flex gap-2">
                     <Button
-                      variant={(startDate && endDate && format(startDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd") && format(endDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")) ? "default" : "outline"}
+                      variant={selectedRange === "today" ? "default" : "outline"}
                       className="h-10 rounded-lg"
                       onClick={() => setQuickRange("today")}
                     >
                       Today
                     </Button>
                     <Button
-                      variant="outline"
+                      variant={selectedRange === "oneweek" ? "default" : "outline"}
                       className="h-10 rounded-lg"
                       onClick={() => setQuickRange("oneweek")}
                     >
                       One Week
                     </Button>
                     <Button
-                      variant="outline"
+                      variant={selectedRange === "onemonth" ? "default" : "outline"}
                       className="h-10 rounded-lg"
                       onClick={() => setQuickRange("onemonth")}
                     >
                       One Month
                     </Button>
                     <Button
-                      variant="outline"
+                      variant={selectedRange === "oneyear" ? "default" : "outline"}
                       className="h-10 rounded-lg"
                       onClick={() => setQuickRange("oneyear")}
                     >
