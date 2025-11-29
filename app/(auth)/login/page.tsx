@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { getErrorMessage } from "@/lib/api";
 import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
@@ -44,8 +45,8 @@ export default function LoginPage() {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to sign in",
+        title: "Sign In Failed",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {

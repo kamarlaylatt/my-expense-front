@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { getErrorMessage } from "@/lib/api";
 import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
@@ -56,8 +57,8 @@ export default function RegisterPage() {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create account",
+        title: "Registration Failed",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {

@@ -27,7 +27,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
-import { expensesApi, categoriesApi, currenciesApi } from "@/lib/api";
+import { expensesApi, categoriesApi, currenciesApi, getErrorMessage } from "@/lib/api";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { Expense, Category, Currency, Pagination, CurrencyTotal } from "@/types";
 import { Plus, CalendarIcon, ChevronLeft, ChevronRight, X, Filter, Receipt, Coins } from "lucide-react";
@@ -82,7 +82,7 @@ export default function ExpensesPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load expenses",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
       console.error("Failed to fetch expenses:", error);
@@ -164,13 +164,11 @@ export default function ExpensesPage() {
         setIsDialogOpen(false);
         setEditingExpense(null);
         fetchExpenses();
-      } else {
-        throw new Error(response.message || "Failed to save expense");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save expense",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -190,13 +188,11 @@ export default function ExpensesPage() {
         });
         setDeleteExpense(null);
         fetchExpenses();
-      } else {
-        throw new Error(response.message || "Failed to delete expense");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete expense",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

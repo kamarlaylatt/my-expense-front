@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { categoriesApi } from "@/lib/api";
+import { categoriesApi, getErrorMessage } from "@/lib/api";
 import type { Category } from "@/types";
 import { Plus, FolderOpen, Tag, Trash2 } from "lucide-react";
 
@@ -39,7 +39,7 @@ export default function CategoriesPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load categories",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
       console.error("Failed to fetch categories:", error);
@@ -76,13 +76,11 @@ export default function CategoriesPage() {
         setIsDialogOpen(false);
         setEditingCategory(null);
         fetchCategories();
-      } else {
-        throw new Error(response.message || "Failed to save category");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save category",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -102,13 +100,11 @@ export default function CategoriesPage() {
         });
         setDeleteCategory(null);
         fetchCategories();
-      } else {
-        throw new Error(response.message || "Failed to delete category");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete category",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

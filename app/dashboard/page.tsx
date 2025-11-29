@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { expensesApi, categoriesApi, currenciesApi } from "@/lib/api";
+import { expensesApi, categoriesApi, currenciesApi, getErrorMessage } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import type { ExpenseSummary, Expense, Category, Currency } from "@/types";
 import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock, Coins } from "lucide-react";
@@ -66,7 +66,7 @@ export default function DashboardPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load dashboard data",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
       console.error("Failed to fetch dashboard data:", error);
@@ -103,13 +103,11 @@ export default function DashboardPage() {
         });
         setIsDialogOpen(false);
         fetchData();
-      } else {
-        throw new Error(response.message || "Failed to create expense");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create expense",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {

@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { currenciesApi } from "@/lib/api";
+import { currenciesApi, getErrorMessage } from "@/lib/api";
 import type { Currency } from "@/types";
 import { Plus, Coins, Trash2 } from "lucide-react";
 
@@ -39,7 +39,7 @@ export default function CurrenciesPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load currencies",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
       console.error("Failed to fetch currencies:", error);
@@ -75,13 +75,11 @@ export default function CurrenciesPage() {
         setIsDialogOpen(false);
         setEditingCurrency(null);
         fetchCurrencies();
-      } else {
-        throw new Error(response.message || "Failed to save currency");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save currency",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -101,13 +99,11 @@ export default function CurrenciesPage() {
         });
         setDeleteCurrency(null);
         fetchCurrencies();
-      } else {
-        throw new Error(response.message || "Failed to delete currency");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete currency",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
