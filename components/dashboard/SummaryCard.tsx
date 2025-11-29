@@ -61,7 +61,7 @@ export function SummaryCard({
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold tracking-tight">{value}</div>
+        <div className="text-xl font-bold tracking-tight whitespace-pre-line">{value}</div>
         <div className="flex items-center gap-2 mt-1">
           {description && (
             <p className="text-sm text-muted-foreground">{description}</p>

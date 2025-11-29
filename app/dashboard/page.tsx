@@ -122,7 +122,7 @@ export default function DashboardPage() {
     }
     return summary.totalsByCurrency
       .map((t) => formatCurrency(t.totalAmount, t.currency.name))
-      .join(" • ");
+      .join("\n");
   };
 
   return (
