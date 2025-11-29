@@ -22,7 +22,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 w-full z-50 border-b bg-background/80 backdrop-blur-lg">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-6 flex h-16 items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Sparkles className="h-5 w-5" />
@@ -60,7 +60,7 @@ export default function Home() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         
-        <div className="container relative">
+        <div className="relative mx-auto max-w-7xl px-6">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-in">
               <Sparkles className="h-4 w-4" />
@@ -108,7 +108,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="py-16 border-y bg-muted/30">
-        <div className="container">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="animate-fade-in">
               <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">100%</div>
@@ -132,7 +132,7 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="py-24">
-        <div className="container">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Everything You Need
@@ -259,7 +259,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-primary/5" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/10 rounded-full blur-3xl" />
         
-        <div className="container relative">
+        <div className="relative mx-auto max-w-7xl px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-6">
               Ready to Take Control?
@@ -282,7 +282,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t py-12 bg-muted/30">
-        <div className="container">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

@@ -26,7 +26,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
       <div className="min-h-screen bg-muted/20" suppressHydrationWarning>
         <div className="h-16 border-b bg-background" suppressHydrationWarning>
-          <div className="container flex h-16 items-center" suppressHydrationWarning>
+          <div className="w-full px-4 md:px-5 flex h-16 items-center" suppressHydrationWarning>
             <Skeleton className="h-9 w-9 rounded-xl" />
             <Skeleton className="h-5 w-28 ml-3" />
             <div className="flex-1" suppressHydrationWarning />

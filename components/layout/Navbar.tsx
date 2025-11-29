@@ -33,7 +33,8 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      {/* Full-width tight padding container for dashboard */}
+      <div className="w-full px-4 md:px-5 flex h-16 items-center">
         {isAuthenticated && (
           <Button
             variant="ghost"
@@ -45,15 +46,15 @@ export function Navbar({ onMenuClick }: NavbarProps) {
             <span className="sr-only">Toggle menu</span>
           </Button>
         )}
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-3">
+        <div className="flex">
+          <Link href="/" className="flex items-center space-x-3 pr-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Sparkles className="h-5 w-5" />
             </div>
             <span className="font-bold text-lg hidden sm:inline-block">ExpenseFlow</span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-3">
+        <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-3">
           <ThemeToggle />
           {isAuthenticated ? (
             <DropdownMenu>
