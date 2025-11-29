@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   <Calendar
                     mode="single"
                     selected={dateRange?.to}
-                    onSelect={(date) => dateRange?.from ? setDateRange({ from: dateRange.from, to: date }) : undefined}
+                    onSelect={(date) => date ? setDateRange({ from: dateRange?.from ?? date, to: date }) : setDateRange(dateRange?.from ? { from: dateRange.from, to: undefined } : undefined)}
                     disabled={(date) => dateRange?.from ? date < dateRange.from : false}
                   />
                 </PopoverContent>
