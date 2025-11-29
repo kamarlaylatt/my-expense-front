@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { SummaryCard } from "@/components/dashboard/SummaryCard";
 import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
@@ -9,6 +11,8 @@ import { ExpenseTable } from "@/components/expenses/ExpenseTable";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +22,9 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { expensesApi, categoriesApi, currenciesApi, getErrorMessage } from "@/lib/api";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import type { ExpenseSummary, Expense, Category, Currency } from "@/types";
-import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock, Coins } from "lucide-react";
+import { Wallet, Receipt, Plus, ArrowRight, FolderOpen, Clock, Coins, CalendarIcon, X } from "lucide-react";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
@@ -30,13 +34,19 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
+      // Format dates for API (YYYY-MM-DD format)
+      const startDate = dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined;
+      const endDate = dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined;
+
       const [summaryRes, expensesRes, categoriesRes, currenciesRes] = await Promise.all([
-        expensesApi.getSummary(),
-        expensesApi.getAll({ limit: 5 }),
+        expensesApi.getSummary(startDate, endDate),
+        expensesApi.getAll({ limit: 5, startDate, endDate }),
         categoriesApi.getAll(),
         currenciesApi.getAll(),
       ]);
@@ -73,7 +83,7 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [dateRange, toast]);
 
   useEffect(() => {
     fetchData();
@@ -125,6 +135,20 @@ export default function DashboardPage() {
       .join("\n");
   };
 
+  // Get description based on date range
+  const getDateRangeDescription = () => {
+    if (dateRange?.from && dateRange?.to) {
+      return `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d, yyyy")}`;
+    }
+    if (dateRange?.from) {
+      return `From ${format(dateRange.from, "MMM d, yyyy")}`;
+    }
+    if (dateRange?.to) {
+      return `Until ${format(dateRange.to, "MMM d, yyyy")}`;
+    }
+    return "All time total";
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -136,13 +160,79 @@ export default function DashboardPage() {
               Welcome back! Here&apos;s your expense overview.
             </p>
           </div>
-          <Button 
-            onClick={() => setIsDialogOpen(true)} 
-            className="rounded-xl h-11 px-5 shadow-lg shadow-primary/25"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Expense
-          </Button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "justify-start text-left font-normal rounded-xl h-11 px-4 min-w-[140px]",
+                      !dateRange?.from && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      format(dateRange.from, "LLL dd, y")
+                    ) : (
+                      <span>Start Date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateRange?.from}
+                    onSelect={(date) => setDateRange({ ...dateRange, from: date })}
+                  />
+                </PopoverContent>
+              </Popover>
+              <span className="text-muted-foreground">-</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "justify-start text-left font-normal rounded-xl h-11 px-4 min-w-[140px]",
+                      !dateRange?.to && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.to ? (
+                      format(dateRange.to, "LLL dd, y")
+                    ) : (
+                      <span>End Date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateRange?.to}
+                    onSelect={(date) => setDateRange({ ...dateRange, to: date })}
+                    disabled={(date) => dateRange?.from ? date < dateRange.from : false}
+                  />
+                </PopoverContent>
+              </Popover>
+              {(dateRange?.from || dateRange?.to) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-11 w-11 rounded-xl"
+                  onClick={() => setDateRange(undefined)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <Button 
+              onClick={() => setIsDialogOpen(true)} 
+              className="rounded-xl h-11 px-5 shadow-lg shadow-primary/25"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Expense
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -150,7 +240,7 @@ export default function DashboardPage() {
           <SummaryCard
             title="Total Expenses"
             value={formatTotalsByCurrency()}
-            description="All time total"
+            description={getDateRangeDescription()}
             icon={Wallet}
             loading={isLoading}
             variant="primary"
@@ -158,7 +248,7 @@ export default function DashboardPage() {
           <SummaryCard
             title="Total Transactions"
             value={summary?.totalCount?.toString() || "0"}
-            description="Number of expenses"
+            description={getDateRangeDescription()}
             icon={Receipt}
             loading={isLoading}
             variant="success"
