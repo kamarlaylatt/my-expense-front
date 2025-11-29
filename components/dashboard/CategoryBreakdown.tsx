@@ -83,10 +83,10 @@ export function CategoryBreakdown({ data, loading }: CategoryBreakdownProps) {
                     <div className="flex items-center gap-2.5">
                       <div
                         className="h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-transform group-hover:scale-110"
-                        style={{ 
+                        style={{
                           backgroundColor: item.category.color || "#888888",
-                          ringColor: item.category.color || "#888888"
-                        }}
+                          "--tw-ring-color": item.category.color || "#888888",
+                        } as React.CSSProperties}
                       />
                       <span className="text-sm font-medium">{item.category.name}</span>
                       <Badge 

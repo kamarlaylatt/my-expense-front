@@ -117,10 +117,12 @@ export function CategoryForm({
                 "relative h-10 w-full rounded-xl transition-all hover:scale-105",
                 selectedColor === color && "ring-2 ring-offset-2 ring-offset-background"
               )}
-              style={{ 
-                backgroundColor: color,
-                ringColor: color
-              }}
+              style={
+                {
+                  backgroundColor: color,
+                  "--tw-ring-color": color,
+                } as React.CSSProperties
+              }
               onClick={() => setValue("color", color)}
             >
               {selectedColor === color && (
