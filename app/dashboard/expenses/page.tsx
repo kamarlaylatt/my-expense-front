@@ -272,9 +272,23 @@ export default function ExpensesPage() {
                       <Coins className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">{currencyTotal.currency.name}</span>
                     </div>
-                    <span className="text-lg font-bold">
-                      {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
-                    </span>
+                    <div className="text-right">
+                      <div className="text-lg font-bold">
+                        {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
+                      </div>
+                      {(() => {
+                        const amount = typeof currencyTotal.totalAmount === "string" ? parseFloat(currencyTotal.totalAmount) : Number(currencyTotal.totalAmount as unknown as number);
+                        const rateRaw = currencyTotal.currency.usdExchangeRate;
+                        const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
+                        if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
+                          return null;
+                        }
+                        const usd = rate >= 10 ? amount / rate : amount * rate;
+                        return (
+                          <div className="text-xs text-muted-foreground">USD {formatCurrency(usd).replace(/^[^\d\-]+/, "")}</div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
