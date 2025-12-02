@@ -262,39 +262,78 @@ export default function ExpensesPage() {
         </div>
 
         {/* Totals by Currency */}
-        {totalsByCurrency.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {totalsByCurrency.map((currencyTotal) => (
-              <Card key={currencyTotal.currency.id} className="border-0 shadow-md">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Coins className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{currencyTotal.currency.name}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold">
-                        {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
+        {totalsByCurrency.length > 0 && (() => {
+          // compute grand USD total across all currencies
+          const grandUsdTotal = totalsByCurrency.reduce((sum, currencyTotal) => {
+            const amount = typeof currencyTotal.totalAmount === "string" ? parseFloat(currencyTotal.totalAmount) : Number(currencyTotal.totalAmount as unknown as number);
+            const rateRaw = currencyTotal.currency.usdExchangeRate;
+            const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
+            if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
+              return sum;
+            }
+            const usd = rate >= 10 ? amount / rate : amount * rate;
+            return sum + usd;
+          }, 0);
+
+          return (
+            <>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {/* Grand USD total card first */}
+                <Card className="border-0 shadow-md">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Coins className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Total (USD)</span>
                       </div>
-                      {(() => {
-                        const amount = typeof currencyTotal.totalAmount === "string" ? parseFloat(currencyTotal.totalAmount) : Number(currencyTotal.totalAmount as unknown as number);
-                        const rateRaw = currencyTotal.currency.usdExchangeRate;
-                        const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
-                        if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
-                          return null;
-                        }
-                        const usd = rate >= 10 ? amount / rate : amount * rate;
-                        return (
-                          <div className="text-xs text-muted-foreground">USD {formatCurrency(usd).replace(/^[^\d\-]+/, "")}</div>
-                        );
-                      })()}
+                      <span className="text-lg font-bold">{formatCurrency(grandUsdTotal)}</span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </CardContent>
+                </Card>
+
+                {totalsByCurrency.map((currencyTotal) => (
+                  <Card key={currencyTotal.currency.id} className="border-0 shadow-md">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Coins className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{currencyTotal.currency.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold">
+                            {formatCurrency(currencyTotal.totalAmount, currencyTotal.currency.name)}
+                          </div>
+                          {(() => {
+                            const amount = typeof currencyTotal.totalAmount === "string" ? parseFloat(currencyTotal.totalAmount) : Number(currencyTotal.totalAmount as unknown as number);
+                            const rateRaw = currencyTotal.currency.usdExchangeRate;
+                            const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
+                            if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
+                              return null;
+                            }
+                            const usd = rate >= 10 ? amount / rate : amount * rate;
+                            return (
+                              <div className="text-xs text-muted-foreground">USD {formatCurrency(usd).replace(/^[^\d\-]+/, "")}</div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Repeat grand total again below totals grid as requested */}
+              <div className="pt-2">
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-3 flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">Combined USD total</div>
+                    <div className="text-base font-semibold">{formatCurrency(grandUsdTotal)}</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          );
+        })()}
 
         {/* Filters */}
         <Card className="border-0 shadow-lg">
