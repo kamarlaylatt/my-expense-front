@@ -88,9 +88,9 @@ export function CategoryBreakdown({ data, loading }: CategoryBreakdownProps) {
         ) : (
           <div className="space-y-5">
             {safeData.map((item) => {
-              const itemAmount = getCategoryTotalAmount(item);
+              const itemAmountUsd = getCategoryTotalAmount(item);
               const percentage = totalAmount > 0 
-                ? Math.round((itemAmount / totalAmount) * 100) 
+                ? Math.round((itemAmountUsd / totalAmount) * 100) 
                 : 0;
               
               return (
@@ -116,6 +116,8 @@ export function CategoryBreakdown({ data, loading }: CategoryBreakdownProps) {
                       <span className="text-xs text-muted-foreground">{percentage}%</span>
                       <span className="text-sm font-semibold">
                         {formatCategoryAmounts(item)}
+                        {" "}
+                        <span className="text-xs text-muted-foreground">(USD: {formatCurrency(itemAmountUsd)})</span>
                       </span>
                     </div>
                   </div>
