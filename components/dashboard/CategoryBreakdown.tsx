@@ -18,8 +18,14 @@ function getCategoryTotalAmount(item: CategoryTotal): number {
   return item.byCurrency.reduce((sum, currencyItem) => {
     // Convert to USD equivalent for comparison
     const amount = parseFloat(currencyItem.totalAmount || "0");
-    const exchangeRate = parseFloat(currencyItem.currency.usdExchangeRate || "1");
-    return sum + (amount * exchangeRate);
+    const rateRaw = currencyItem.currency.usdExchangeRate;
+    const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
+    if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
+      return sum;
+    }
+    // Heuristic: large rates (>=10) are currency-per-USD -> divide; small rates are USD-per-currency -> multiply
+    const usd = rate >= 10 ? amount / rate : amount * rate;
+    return sum + usd;
   }, 0);
 }
 

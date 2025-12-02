@@ -135,12 +135,15 @@ export default function DashboardPage() {
     );
     // Also compute USD total based on exchange rates
     const usdTotal = summary.totalsByCurrency.reduce((sum, t) => {
-      const amount = typeof t.totalAmount === "string" ? parseFloat(t.totalAmount) : (t.totalAmount as unknown as number);
-      const rate = parseFloat(t.currency.usdExchangeRate || "1");
-      if (!Number.isNaN(amount) && !Number.isNaN(rate) && rate > 0) {
-        return sum + amount * rate;
+      const amount = typeof t.totalAmount === "string" ? parseFloat(t.totalAmount) : Number(t.totalAmount as unknown as number);
+      const rateRaw = t.currency.usdExchangeRate;
+      const rate = typeof rateRaw === "string" ? parseFloat(rateRaw) : Number(rateRaw);
+      if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
+        return sum;
       }
-      return sum;
+      // Heuristic: if rate is large (>= 10), treat as currency-per-USD and divide; else treat as USD-per-currency and multiply.
+      const usd = rate >= 10 ? amount / rate : amount * rate;
+      return sum + usd;
     }, 0);
     lines.push(`${formatCurrency(usdTotal)} USD`);
     return lines.join("\n");
