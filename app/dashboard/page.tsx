@@ -130,9 +130,20 @@ export default function DashboardPage() {
     if (!summary?.totalsByCurrency || summary.totalsByCurrency.length === 0) {
       return "$0.00";
     }
-    return summary.totalsByCurrency
-      .map((t) => formatCurrency(t.totalAmount, t.currency.name))
-      .join("\n");
+    const lines = summary.totalsByCurrency.map((t) =>
+      formatCurrency(t.totalAmount, t.currency.name)
+    );
+    // Also compute USD total based on exchange rates
+    const usdTotal = summary.totalsByCurrency.reduce((sum, t) => {
+      const amount = typeof t.totalAmount === "string" ? parseFloat(t.totalAmount) : (t.totalAmount as unknown as number);
+      const rate = parseFloat(t.currency.usdExchangeRate || "1");
+      if (!Number.isNaN(amount) && !Number.isNaN(rate) && rate > 0) {
+        return sum + amount * rate;
+      }
+      return sum;
+    }, 0);
+    lines.push(`${formatCurrency(usdTotal)} USD`);
+    return lines.join("\n");
   };
 
   // Get description based on date range
