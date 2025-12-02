@@ -130,10 +130,7 @@ export default function DashboardPage() {
     if (!summary?.totalsByCurrency || summary.totalsByCurrency.length === 0) {
       return "$0.00";
     }
-    const lines = summary.totalsByCurrency.map((t) =>
-      formatCurrency(t.totalAmount, t.currency.name)
-    );
-    // Also compute USD total based on exchange rates
+    // Compute USD total based on exchange rates (using heuristic for direction)
     const usdTotal = summary.totalsByCurrency.reduce((sum, t) => {
       const amount = typeof t.totalAmount === "string" ? parseFloat(t.totalAmount) : Number(t.totalAmount as unknown as number);
       const rateRaw = t.currency.usdExchangeRate;
@@ -141,12 +138,12 @@ export default function DashboardPage() {
       if (!Number.isFinite(amount) || !Number.isFinite(rate) || rate <= 0) {
         return sum;
       }
-      // Heuristic: if rate is large (>= 10), treat as currency-per-USD and divide; else treat as USD-per-currency and multiply.
       const usd = rate >= 10 ? amount / rate : amount * rate;
       return sum + usd;
     }, 0);
-    lines.push(`${formatCurrency(usdTotal)} USD`);
-    return lines.join("\n");
+
+    // Show only the USD total in the SummaryCard value
+    return formatCurrency(usdTotal);
   };
 
   // Get description based on date range
