@@ -35,7 +35,7 @@ function formatCategoryAmounts(item: CategoryTotal): string {
     return formatCurrency(0);
   }
   return item.byCurrency
-    .map(c => `${formatCurrency(parseFloat(c.totalAmount || "0"))} ${c.currency.name}`)
+    .map(c => `${formatCurrency(parseFloat(c.totalAmount || "0"), c.currency.name)}`)
     .join(", ");
 }
 
