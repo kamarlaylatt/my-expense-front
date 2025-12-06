@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +25,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { login, googleAuth, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const googleClientId =
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "";
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -52,6 +57,50 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      toast({ title: "Google sign-in failed", description: "No credential returned", variant: "destructive" });
+      return;
+    }
+
+    setIsGoogleLoading(true);
+    try {
+      const decoded = jwtDecode<{ email: string; name?: string; sub: string; picture?: string }>(
+        credentialResponse.credential
+      );
+
+      if (!decoded.email || !decoded.sub) {
+        throw new Error("Missing email or subject in Google token");
+      }
+
+      await googleAuth({
+        email: decoded.email,
+        name: decoded.name,
+        provider: "google",
+        providerAccountId: decoded.sub,
+        image: decoded.picture,
+      });
+
+      toast({ title: "Welcome back!", description: "Signed in with Google." });
+    } catch (error) {
+      toast({
+        title: "Google sign-in failed",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast({
+      title: "Google sign-in failed",
+      description: "Please try again",
+      variant: "destructive",
+    });
   };
 
   if (authLoading || isAuthenticated) {
@@ -115,12 +164,35 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                <span>or</span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <div className="flex justify-center">
+                {googleClientId ? (
+                  <GoogleOAuthProvider clientId={googleClientId}>
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      shape="pill"
+                      useOneTap
+                      theme="outline"
+                      text="continue_with"
+                    />
+                  </GoogleOAuthProvider>
+                ) : (
+                  <Button type="button" variant="outline" className="w-full" disabled>
+                    Add NEXT_PUBLIC_GOOGLE_CLIENT_ID
+                  </Button>
+                )}
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-2">
               <Button 
                 type="submit" 
                 className="w-full h-11 rounded-xl text-base font-medium shadow-lg shadow-primary/25" 
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

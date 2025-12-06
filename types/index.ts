@@ -2,8 +2,20 @@ export interface User {
   id: number;
   email: string;
   name: string;
+  provider?: string;
+  providerAccountId?: string;
+  emailVerified?: boolean;
+  image?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface GoogleOAuthCredentials {
+  email: string;
+  name?: string;
+  providerAccountId: string;
+  provider: "google";
+  image?: string;
 }
 
 export interface Category {

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { User, LoginCredentials, SignupCredentials } from "@/types";
+import type { User, LoginCredentials, SignupCredentials, GoogleOAuthCredentials } from "@/types";
 import { authApi } from "@/lib/api";
 
 interface AuthContextType {
@@ -10,8 +10,10 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  googleAuth: (payload: GoogleOAuthCredentials) => Promise<void>;
   signup: (credentials: SignupCredentials) => Promise<void>;
   logout: () => void;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,6 +59,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const googleAuth = async (payload: GoogleOAuthCredentials) => {
+    const response = await authApi.googleAuth(payload);
+    if (response.success && response.data) {
+      localStorage.setItem("token", response.data.token);
+      setUser(response.data.user);
+      router.push("/dashboard");
+    } else {
+      throw new Error(response.message || "Google login failed");
+    }
+  };
+
   const signup = async (credentials: SignupCredentials) => {
     const response = await authApi.signup(credentials);
     if (response.success && response.data) {
@@ -80,8 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         login,
+        googleAuth,
         signup,
         logout,
+        setUser,
       }}
     >
       {children}

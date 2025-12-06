@@ -18,6 +18,7 @@ import type {
   UpdateCurrency,
   ExpenseFilters,
   CurrencyTotal,
+  GoogleOAuthCredentials,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -155,6 +156,13 @@ export const authApi = {
 
   signin: async (credentials: LoginCredentials): Promise<ApiResponse<{ token: string; user: User }>> => {
     const response = await api.post<ApiResponse<{ token: string; user: User }>>("/api/auth/signin", credentials);
+    return response.data;
+  },
+
+  googleAuth: async (
+    payload: GoogleOAuthCredentials
+  ): Promise<ApiResponse<{ token: string; user: User }>> => {
+    const response = await api.post<ApiResponse<{ token: string; user: User }>>("/api/auth/google", payload);
     return response.data;
   },
 
