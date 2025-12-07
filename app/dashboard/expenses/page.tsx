@@ -79,8 +79,9 @@ export default function ExpensesPage() {
           amount: typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
         }));
         setExpenses(normalizedExpenses);
-        // Pagination is inside data object
-        setPagination((response.data as any).pagination || response.pagination || null);
+        // Pagination is inside the data payload for this endpoint
+        const payloadPagination = (response.data as { pagination?: Pagination | null })?.pagination;
+        setPagination(payloadPagination || null);
         setTotalsByCurrency(response.data.totalsByCurrency || []);
       }
     } catch (error) {
