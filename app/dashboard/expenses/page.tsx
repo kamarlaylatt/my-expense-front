@@ -71,6 +71,7 @@ export default function ExpensesPage() {
         page: currentPage,
         limit: limit,
       });
+      
       if (response.success && response.data) {
         const expensesData = response.data.expenses || [];
         const normalizedExpenses = expensesData.map((e) => ({
@@ -78,7 +79,8 @@ export default function ExpensesPage() {
           amount: typeof e.amount === "string" ? parseFloat(e.amount) : e.amount,
         }));
         setExpenses(normalizedExpenses);
-        setPagination(response.pagination || null);
+        // Pagination is inside data object
+        setPagination((response.data as any).pagination || response.pagination || null);
         setTotalsByCurrency(response.data.totalsByCurrency || []);
       }
     } catch (error) {
@@ -127,11 +129,6 @@ export default function ExpensesPage() {
   useEffect(() => {
     fetchExpenses();
   }, [fetchExpenses]);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [categoryFilter, startDate, endDate, limit]);
 
   const handleCreateOrUpdateExpense = async (data: {
     amount: number;
@@ -218,8 +215,8 @@ export default function ExpensesPage() {
     setCategoryFilter("");
     setStartDate(undefined);
     setEndDate(undefined);
-    setCurrentPage(1);
     setSelectedRange(null);
+    setCurrentPage(1);
   };
 
   const setQuickRange = (range: "today" | "oneweek" | "onemonth" | "oneyear") => {
@@ -241,10 +238,10 @@ export default function ExpensesPage() {
     } else if (range === "oneyear") {
       start.setFullYear(start.getFullYear() - 1);
     }
+    setSelectedRange(range);
     setStartDate(start);
     setEndDate(end);
     setCurrentPage(1);
-    setSelectedRange(range);
   };
 
   return (
@@ -391,7 +388,10 @@ export default function ExpensesPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <Select value={categoryFilter} onValueChange={(value) => {
+                    setCategoryFilter(value);
+                    setCurrentPage(1);
+                  }}>
                     <SelectTrigger className="w-[180px] h-10 rounded-lg">
                       <SelectValue placeholder="All categories" />
                     </SelectTrigger>
@@ -434,7 +434,10 @@ export default function ExpensesPage() {
                       <Calendar
                         mode="single"
                         selected={startDate}
-                        onSelect={setStartDate}
+                        onSelect={(date) => {
+                          setStartDate(date);
+                          setCurrentPage(1);
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -460,7 +463,10 @@ export default function ExpensesPage() {
                       <Calendar
                         mode="single"
                         selected={endDate}
-                        onSelect={setEndDate}
+                        onSelect={(date) => {
+                          setEndDate(date);
+                          setCurrentPage(1);
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -491,20 +497,27 @@ export default function ExpensesPage() {
         />
 
         {/* Pagination */}
-        {pagination && pagination.total > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <div className="flex items-center gap-4">
+        {!isLoading && expenses.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t mt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium text-foreground">{Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}</span> to{" "}
-                <span className="font-medium text-foreground">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{" "}
-                <span className="font-medium text-foreground">{pagination.total}</span> expenses
+                {pagination ? (
+                  <>
+                    Showing <span className="font-medium text-foreground">{Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}</span> to{" "}
+                    <span className="font-medium text-foreground">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{" "}
+                    <span className="font-medium text-foreground">{pagination.total}</span> expenses
+                  </>
+                ) : (
+                  <>Showing {expenses.length} expenses</>
+                )}
               </p>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-muted-foreground">Per page:</label>
                 <Select
                   value={limit.toString()}
                   onValueChange={(value) => {
-                    setLimit(parseInt(value));
+                    const newLimit = parseInt(value);
+                    setLimit(newLimit);
                     setCurrentPage(1);
                   }}
                 >
@@ -520,7 +533,7 @@ export default function ExpensesPage() {
                 </Select>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -531,16 +544,16 @@ export default function ExpensesPage() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Previous
               </Button>
-              <div className="flex items-center gap-1">
-                <span className="text-sm text-muted-foreground px-2">
-                  Page {pagination.page} of {pagination.totalPages}
+              <div className="flex items-center gap-1 px-2">
+                <span className="text-sm text-muted-foreground">
+                  Page <span className="font-medium text-foreground">{currentPage}</span> of <span className="font-medium text-foreground">{pagination?.totalPages || 1}</span>
                 </span>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((p) => p + 1)}
-                disabled={currentPage >= pagination.totalPages}
+                disabled={!pagination || currentPage >= pagination.totalPages}
                 className="rounded-lg"
               >
                 Next
