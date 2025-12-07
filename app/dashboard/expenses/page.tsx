@@ -51,6 +51,7 @@ export default function ExpensesPage() {
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [selectedRange, setSelectedRange] = useState<"today" | "oneweek" | "onemonth" | "oneyear" | null>(null);
 
   const { toast } = useToast();
@@ -68,7 +69,7 @@ export default function ExpensesPage() {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         page: currentPage,
-        limit: 10,
+        limit: limit,
       });
       if (response.success && response.data) {
         const expensesData = response.data.expenses || [];
@@ -90,7 +91,7 @@ export default function ExpensesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [categoryFilter, startDate, endDate, currentPage, toast]);
+  }, [categoryFilter, startDate, endDate, currentPage, limit, toast]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -126,6 +127,11 @@ export default function ExpensesPage() {
   useEffect(() => {
     fetchExpenses();
   }, [fetchExpenses]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, startDate, endDate, limit]);
 
   const handleCreateOrUpdateExpense = async (data: {
     amount: number;
@@ -485,13 +491,35 @@ export default function ExpensesPage() {
         />
 
         {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
+        {pagination && pagination.total > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <p className="text-sm text-muted-foreground">
-              Showing page <span className="font-medium text-foreground">{pagination.page}</span> of{" "}
-              <span className="font-medium text-foreground">{pagination.totalPages}</span>
-              {" "}• {pagination.total} total expenses
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                Showing <span className="font-medium text-foreground">{Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}</span> to{" "}
+                <span className="font-medium text-foreground">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{" "}
+                <span className="font-medium text-foreground">{pagination.total}</span> expenses
+              </p>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-muted-foreground">Per page:</label>
+                <Select
+                  value={limit.toString()}
+                  onValueChange={(value) => {
+                    setLimit(parseInt(value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] h-8 rounded-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -503,6 +531,11 @@ export default function ExpensesPage() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Previous
               </Button>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground px-2">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 size="sm"
