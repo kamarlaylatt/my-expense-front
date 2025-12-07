@@ -280,7 +280,7 @@ export default function ExpensesPage() {
 
           return (
             <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
                 {/* Grand USD total card first */}
                 <Card className="border-0 shadow-md">
                   <CardContent className="p-4">
@@ -352,47 +352,47 @@ export default function ExpensesPage() {
             </div>
             <div className="space-y-4">
               {/* Row 1: Quick Range Buttons + Category */}
-              <div className="flex flex-wrap gap-4 items-end">
-                <div className="space-y-2">
+              <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap items-start">
+                <div className="space-y-2 w-full lg:w-auto">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Date Range</label>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                     <Button
                       variant={selectedRange === "today" ? "default" : "outline"}
-                      className="h-10 rounded-lg"
+                      className="h-10 rounded-lg w-full sm:w-auto"
                       onClick={() => setQuickRange("today")}
                     >
                       Today
                     </Button>
                     <Button
                       variant={selectedRange === "oneweek" ? "default" : "outline"}
-                      className="h-10 rounded-lg"
+                      className="h-10 rounded-lg w-full sm:w-auto"
                       onClick={() => setQuickRange("oneweek")}
                     >
                       One Week
                     </Button>
                     <Button
                       variant={selectedRange === "onemonth" ? "default" : "outline"}
-                      className="h-10 rounded-lg"
+                      className="h-10 rounded-lg w-full sm:w-auto"
                       onClick={() => setQuickRange("onemonth")}
                     >
                       One Month
                     </Button>
                     <Button
                       variant={selectedRange === "oneyear" ? "default" : "outline"}
-                      className="h-10 rounded-lg"
+                      className="h-10 rounded-lg w-full sm:w-auto"
                       onClick={() => setQuickRange("oneyear")}
                     >
                       One Year
                     </Button>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full sm:w-auto sm:min-w-[220px]">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
                   <Select value={categoryFilter} onValueChange={(value) => {
                     setCategoryFilter(value);
                     setCurrentPage(1);
                   }}>
-                    <SelectTrigger className="w-[180px] h-10 rounded-lg">
+                    <SelectTrigger className="w-full sm:w-[200px] h-10 rounded-lg">
                       <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -414,15 +414,15 @@ export default function ExpensesPage() {
               </div>
 
               {/* Row 2: Start Date + End Date + Clear filters */}
-              <div className="flex flex-wrap gap-4 items-end">
-                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0">
+              <div className="flex flex-col md:flex-row md:flex-wrap gap-4 items-start">
+                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0 w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider sm:whitespace-nowrap sm:mr-2">Start Date</label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-[200px] justify-start text-left font-normal h-10 rounded-lg",
+                          "w-full sm:w-[220px] justify-start text-left font-normal h-10 rounded-lg",
                           !startDate && "text-muted-foreground"
                         )}
                       >
@@ -444,14 +444,14 @@ export default function ExpensesPage() {
                   </Popover>
                 </div>
 
-                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0">
+                <div className="space-y-2 sm:flex sm:items-center sm:gap-2 sm:space-y-0 w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider sm:whitespace-nowrap sm:mr-2">End Date</label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-[200px] justify-start text-left font-normal h-10 rounded-lg",
+                          "w-full sm:w-[220px] justify-start text-left font-normal h-10 rounded-lg",
                           !endDate && "text-muted-foreground"
                         )}
                       >
@@ -477,7 +477,7 @@ export default function ExpensesPage() {
                   <Button 
                     variant="ghost" 
                     onClick={clearFilters}
-                    className="h-10 rounded-lg text-muted-foreground hover:text-foreground"
+                    className="h-10 rounded-lg text-muted-foreground hover:text-foreground w-full sm:w-auto"
                   >
                     <X className="mr-2 h-4 w-4" />
                     Clear filters

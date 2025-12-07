@@ -247,7 +247,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 stagger-fade-in">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 stagger-fade-in">
           <SummaryCard
             title="Total Expenses"
             value={formatTotalsByCurrency()}
@@ -264,27 +264,11 @@ export default function DashboardPage() {
             loading={isLoading}
             variant="success"
           />
-          <SummaryCard
-            title="Categories"
-            value={(categories?.length || 0).toString()}
-            description="Active categories"
-            icon={FolderOpen}
-            loading={isLoading}
-            variant="warning"
-          />
-          <SummaryCard
-            title="Currencies"
-            value={(currencies?.length || 0).toString()}
-            description="Active currencies"
-            icon={Coins}
-            loading={isLoading}
-            variant="default"
-          />
         </div>
 
         {/* Currency Breakdown Cards */}
         {summary?.totalsByCurrency && summary.totalsByCurrency.length > 1 && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
             {summary.totalsByCurrency.map((currencyTotal) => (
               <Card key={currencyTotal.currency.id} className="border-0 shadow-md">
                 <CardContent className="p-4">

@@ -91,7 +91,7 @@ export function ExpenseForm({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
           <div className="relative">
@@ -209,19 +209,19 @@ export function ExpenseForm({
         </Popover>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="rounded-xl"
+          className="rounded-xl w-full sm:w-auto"
         >
           Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="rounded-xl min-w-[100px]"
+          className="rounded-xl min-w-[120px] w-full sm:w-auto"
         >
           {isLoading ? (
             <span className="flex items-center gap-2">

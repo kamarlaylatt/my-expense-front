@@ -40,38 +40,40 @@ export function ExpenseTable({
   if (loading) {
     return (
       <div className="rounded-xl border bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold">Date</TableHead>
-              <TableHead className="font-semibold">Description</TableHead>
-              <TableHead className="font-semibold">Category</TableHead>
-              <TableHead className="text-right font-semibold">Amount</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <Skeleton className="h-4 w-24" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-32" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-20 ml-auto" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-8 w-8 rounded-lg" />
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table className="min-w-[640px]">
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="font-semibold">Date</TableHead>
+                <TableHead className="font-semibold">Description</TableHead>
+                <TableHead className="font-semibold">Category</TableHead>
+                <TableHead className="text-right font-semibold">Amount</TableHead>
+                <TableHead className="w-[70px]"></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20 ml-auto" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   }
@@ -89,31 +91,103 @@ export function ExpenseTable({
   }
 
   return (
-    <div className="rounded-xl border bg-card overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="font-semibold">Date</TableHead>
-            <TableHead className="font-semibold">Description</TableHead>
-            <TableHead className="font-semibold">Category</TableHead>
-            <TableHead className="text-right font-semibold">Amount</TableHead>
-            <TableHead className="w-[70px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {safeExpenses.map((expense) => (
-            <TableRow key={expense.id} className="group">
-              <TableCell className="font-medium text-muted-foreground">
-                {formatDate(expense.date)}
-              </TableCell>
-              <TableCell className="font-medium">
-                {expense.description || <span className="text-muted-foreground">—</span>}
-              </TableCell>
-              <TableCell>
+    <div className="space-y-4">
+      {/* Desktop/Table view */}
+      <div className="hidden sm:block rounded-xl border bg-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[640px]">
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="font-semibold">Date</TableHead>
+                <TableHead className="font-semibold">Description</TableHead>
+                <TableHead className="font-semibold">Category</TableHead>
+                <TableHead className="text-right font-semibold">Amount</TableHead>
+                <TableHead className="w-[70px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {safeExpenses.map((expense) => (
+                <TableRow key={expense.id} className="group">
+                  <TableCell className="font-medium text-muted-foreground">
+                    {formatDate(expense.date)}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {expense.description || <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell>
+                    {expense.category && (
+                      <Badge
+                        variant="secondary"
+                        className="rounded-full font-medium px-3 py-1 border-0"
+                        style={{
+                          backgroundColor: expense.category.color
+                            ? `${expense.category.color}15`
+                            : undefined,
+                          color: expense.category.color || undefined,
+                        }}
+                      >
+                        <div
+                          className="mr-2 h-2 w-2 rounded-full"
+                          style={{
+                            backgroundColor: expense.category.color || "#888888",
+                          }}
+                        />
+                        {expense.category.name}
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="font-semibold text-foreground">
+                      {formatCurrency(expense.amount, expense.currency?.name)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                        >
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => onEdit(expense)} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive cursor-pointer"
+                          onClick={() => onDelete(expense)}
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {safeExpenses.map((expense) => (
+          <div key={expense.id} className="rounded-xl border bg-card p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">{formatDate(expense.date)}</p>
+                <p className="font-semibold leading-snug">
+                  {expense.description || <span className="text-muted-foreground">No description</span>}
+                </p>
                 {expense.category && (
                   <Badge
                     variant="secondary"
-                    className="rounded-full font-medium px-3 py-1 border-0"
+                    className="rounded-full font-medium px-2.5 py-1 border-0"
                     style={{
                       backgroundColor: expense.category.color
                         ? `${expense.category.color}15`
@@ -123,49 +197,27 @@ export function ExpenseTable({
                   >
                     <div
                       className="mr-2 h-2 w-2 rounded-full"
-                      style={{
-                        backgroundColor: expense.category.color || "#888888",
-                      }}
+                      style={{ backgroundColor: expense.category.color || "#888888" }}
                     />
                     {expense.category.name}
                   </Badge>
                 )}
-              </TableCell>
-              <TableCell className="text-right">
-                <span className="font-semibold text-foreground">
-                  {formatCurrency(expense.amount, expense.currency?.name)}
-                </span>
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
-                    >
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem onClick={() => onEdit(expense)} className="cursor-pointer">
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive cursor-pointer"
-                      onClick={() => onDelete(expense)}
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold">{formatCurrency(expense.amount, expense.currency?.name)}</p>
+                <div className="flex justify-end gap-2 mt-2">
+                  <Button size="sm" variant="outline" className="h-9 rounded-lg" onClick={() => onEdit(expense)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-9 rounded-lg text-destructive" onClick={() => onDelete(expense)}>
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

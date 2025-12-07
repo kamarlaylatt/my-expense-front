@@ -22,14 +22,14 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 w-full z-50 border-b bg-background/80 backdrop-blur-lg">
-        <div className="mx-auto max-w-7xl px-6 flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-6 flex h-16 items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Sparkles className="h-5 w-5" />
             </div>
             <span className="font-bold text-xl">ExpenseFlow</span>
           </div>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-3 flex-wrap justify-end">
             {!isLoading && (
               isAuthenticated ? (
                 <Button asChild className="rounded-full px-6">
@@ -142,8 +142,8 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-fade-in">
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+          <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(260px,1fr))] stagger-fade-in">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Receipt className="h-7 w-7 text-primary" />
@@ -161,7 +161,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <FolderOpen className="h-7 w-7 text-primary" />
@@ -179,7 +179,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <TrendingUp className="h-7 w-7 text-primary" />
@@ -197,7 +197,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Shield className="h-7 w-7 text-primary" />
@@ -215,7 +215,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Zap className="h-7 w-7 text-primary" />
@@ -233,7 +233,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover-lift shine border-0 shadow-lg bg-gradient-to-br from-card to-muted/20">
+            <Card className="group hover-lift shine border-0 shadow-lg bg-linear-to-br from-card to-muted/20">
               <CardHeader className="pb-4">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <LayoutDashboard className="h-7 w-7 text-primary" />

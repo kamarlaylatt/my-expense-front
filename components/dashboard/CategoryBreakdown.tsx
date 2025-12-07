@@ -101,8 +101,8 @@ export function CategoryBreakdown({ data, loading }: CategoryBreakdownProps) {
               
               return (
                 <div key={item.category.id} className="space-y-2.5 group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2.5 flex-wrap">
                       <div
                         className="h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-transform group-hover:scale-110"
                         style={{
@@ -117,14 +117,16 @@ export function CategoryBreakdown({ data, loading }: CategoryBreakdownProps) {
                       >
                         {item.totalCount} {item.totalCount === 1 ? "expense" : "expenses"}
                       </Badge>
+                      <span className="text-xs text-muted-foreground sm:hidden">{percentage}%</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{percentage}%</span>
-                      <span className="text-sm font-semibold">
+                    <div className="flex flex-col gap-1 sm:items-end sm:text-right text-sm">
+                      <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{percentage}%</span>
+                      </div>
+                      <span className="font-semibold leading-tight wrap-break-word">
                         {formatCategoryAmounts(item)}
-                        {" "}
-                        <span className="text-xs text-muted-foreground">(USD: {formatCurrency(itemAmountUsd)})</span>
                       </span>
+                      <span className="text-xs text-muted-foreground">USD: {formatCurrency(itemAmountUsd)}</span>
                     </div>
                   </div>
                   <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
